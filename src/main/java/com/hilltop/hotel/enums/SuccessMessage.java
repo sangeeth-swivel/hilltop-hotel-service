@@ -9,9 +9,9 @@ import lombok.Getter;
 public enum SuccessMessage {
 
     SUCCESSFULLY_ADDED("Successfully added."),
-    SUCCESSFULLY_LOGGED_IN("Successfully logged in."),
-    VALID_TOKEN("Valid token");
-
+    SUCCESSFULLY_UPDATED("Successfully updated."),
+    SUCCESSFULLY_RETURNED("Successfully returned data."),
+    SUCCESSFULLY_DELETED("Successfully deleted.");
     private final String message;
 
     SuccessMessage(String message) {
