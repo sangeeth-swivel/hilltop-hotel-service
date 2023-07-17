@@ -20,7 +20,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: '17'
+          java-version: '11'
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
@@ -29,7 +29,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Run Tests
         run: mvn -B test
-  #Sonar scan workflow
+#Sonar scan workflow
 #  scan:
 #    needs: tests
 #    name: Sonar Analysis
@@ -63,7 +63,7 @@ jobs:
 
   scan:
     needs: tests
-    name: Build and analyze
+    name: Sonar Analysis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -102,7 +102,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: "17"
+          java-version: "11"
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
