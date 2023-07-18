@@ -52,7 +52,61 @@ public class HotelService {
         for (Hotel hotel : hotelList) {
             List<Room> sortedRoomList = hotel.getRooms().stream()
                     .filter(room -> room.getMaxPeople() == paxCount).collect(Collectors.toList());
+            if (sortedRoomList.isEmpty())
+                sortedRoomList = getPossibleRoomsForPaxCount(hotel.getRooms(), paxCount);
+            if (!sortedRoomList.isEmpty())
+                hotelAndRoomsMap.put(hotel, sortedRoomList);
         }
         return hotelAndRoomsMap;
     }
+
+    /**
+     * This method is used to get possible rooms for pax count.
+     *
+     * @param roomSet  roomSet
+     * @param paxCount paxCount
+     * @return room list
+     */
+    private List<Room> getPossibleRoomsForPaxCount(Set<Room> roomSet, int paxCount) {
+        List<Room> sortedRoomList = roomSet.stream()
+                .filter(room -> room.getMaxPeople() > paxCount && room.getMaxPeople() <= paxCount + 2)
+                .collect(Collectors.toList());
+        if (sortedRoomList.isEmpty()) {
+            Optional<Room> optionalRoom = roomSet.stream()
+                    .filter(room -> room.getMaxPeople() < paxCount)
+                    .findFirst();
+            if (optionalRoom.isPresent()) {
+                sortedRoomList = getRoomCombination(optionalRoom.get(), roomSet, paxCount);
+            }
+        }
+        return sortedRoomList;
+    }
+
+    /**
+     * This method is used to return multiple rooms to fulfill pax count.
+     *
+     * @param possibleMaximumPaxRoom possibleMaximumPaxRoom
+     * @param roomSet                roomSet
+     * @param paxCount               paxCount
+     * @return room list
+     */
+    private List<Room> getRoomCombination(Room possibleMaximumPaxRoom, Set<Room> roomSet, int paxCount) {
+        List<Room> sortedRoomList = new ArrayList<>();
+        sortedRoomList.add(possibleMaximumPaxRoom);
+        int totalPaxCount = possibleMaximumPaxRoom.getMaxPeople();
+        List<Room> paxCountDescendingRoomList = roomSet.stream()
+                .sorted(Comparator.comparing(Room::getMaxPeople).reversed())
+                .filter(room -> !room.equals(possibleMaximumPaxRoom))
+                .collect(Collectors.toList());
+        for (Room room : paxCountDescendingRoomList) {
+            while (totalPaxCount + room.getMaxPeople() <= paxCount) {
+                sortedRoomList.add(room);
+                totalPaxCount += room.getMaxPeople();
+                if (totalPaxCount == paxCount)
+                    return sortedRoomList;
+            }
+        }
+        return List.of();
+    }
+
 }
