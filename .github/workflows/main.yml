@@ -81,7 +81,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: artifact
-          path: target/hilltop-hotel-0.0.1-SNAPSHOT
+          path: target/hilltop-hotel-0.0.1-SNAPSHOT.jar
   deploy:
     needs: build
     name: Deploy to Elastic Beanstalk
