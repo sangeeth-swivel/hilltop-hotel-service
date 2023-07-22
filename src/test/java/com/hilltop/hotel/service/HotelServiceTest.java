@@ -101,8 +101,11 @@ class HotelServiceTest {
         return room;
     }
 
+    /**
+     * This method is used to returnExistingNameException()
+     */
     @Test
-    public void TestExistingNameException() {
+    void Should_ReturnExistingNameException() {
         String errorMessage = "Name already exists!";
         ExistingNameException exception = new ExistingNameException(errorMessage);
         assertEquals(errorMessage, exception.getMessage(), "Hotel name exist in database.");

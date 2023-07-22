@@ -65,6 +65,9 @@ class HotelControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessMessage.SUCCESSFULLY_ADDED.getMessage()));
     }
 
+    /**
+     * Unit tests for returnBadRequest_When_MissingRequiredFields() method.
+     */
     @Test
     void Should_ReturnBadRequest_When_MissingRequiredFields() throws Exception {
         HotelRequestDto requestDto = updateHotelRequestDto;
@@ -91,6 +94,9 @@ class HotelControllerTest {
                 .andExpect(jsonPath("$.data").isEmpty());
     }
 
+    /**
+     * Unit tests for updateHotelFieldsAreMissing() method.
+     */
     @Test
     void Should_ReturnBadRequest_When_UpdateHotelFieldsAreMissing() throws Exception {
         HotelRequestDto requestDto = updateHotelRequestDto;
@@ -114,6 +120,9 @@ class HotelControllerTest {
                 .andExpect(jsonPath("$.message").value(SuccessMessage.SUCCESSFULLY_RETURNED.getMessage()));
     }
 
+    /**
+     * Unit test for listAllHotelsIsSuccessful() method.
+     */
     @Test
     void Should_ReturnOk_When_ListAllHotelsIsSuccessful() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(LIST_ALL_HOTEL_URI)
@@ -143,25 +152,21 @@ class HotelControllerTest {
         HillTopHotelApplicationException exception = new HillTopHotelApplicationException("Failed.");
         ResponseEntity<ResponseWrapper> expectedResponse = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        // Mock the behavior of the baseController
         when(baseController.getInternalServerError()).thenReturn(expectedResponse);
 
-        // Invoke the exception handler
         ResponseEntity<ResponseWrapper> actualResponse = globalControllerExceptionHandler.hillTopUserApplicationException(exception);
 
-        // Verify the interactions and assertions
         verify(baseController, times(1)).getInternalServerError();
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actualResponse.getStatusCode());
         assertEquals(expectedResponse.getBody(), actualResponse.getBody());
     }
 
     /**
-     *
+     * Unit test for DataNotFoundException
      */
     @Test
-    void testDataNotFoundException() {
+    void Should_ReturnDataNotFoundException() {
         String errorMessage = "Data not found!";
-        // Act and Assert
         DataNotFoundException exception = assertThrows(DataNotFoundException.class, () -> {
             throw new DataNotFoundException(errorMessage);
         });

@@ -34,9 +34,11 @@ class RoomResponseDtoTest {
         roomTypeRequestDto.setMarkupPercentage(10);
     }
 
+    /**
+     * This method is used to returnIsRequiredFieldsAvailable()
+     */
     @Test
-    public void TestIsRequiredFieldsAvailable() {
-        // Arrange
+    void Should_ReturnIsRequiredFieldsAvailable() {
         String roomNo = "101";
         String hotelId = "1234";
         String roomTypeId = "5678";
@@ -63,8 +65,11 @@ class RoomResponseDtoTest {
         assertFalse(invalidCostDto.isRequiredFieldsAvailable(), "Invalid cost, should return false.");
     }
 
+    /**
+     * This method is used to returnRoomResponseDtoConstructor()
+     */
     @Test
-    public void testRoomResponseDtoConstructor() {
+    void Should_ReturnRoomResponseDtoConstructor() {
         String roomNo = "101";
         RoomType roomType = new RoomType(roomTypeRequestDto);
         Hotel hotel = new Hotel(hotelRequestDto);
