@@ -2,17 +2,26 @@ package com.hilltop.hotel.controller;
 
 import com.hilltop.hotel.domain.request.HotelRequestDto;
 import com.hilltop.hotel.domain.request.UpdateHotelRequestDto;
+import com.hilltop.hotel.domain.response.ResponseWrapper;
 import com.hilltop.hotel.enums.ErrorMessage;
 import com.hilltop.hotel.enums.SuccessMessage;
+import com.hilltop.hotel.exception.DataNotFoundException;
+import com.hilltop.hotel.exception.HillTopHotelApplicationException;
 import com.hilltop.hotel.service.HotelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,6 +41,10 @@ class HotelControllerTest {
     @Mock
     private HotelService hotelService;
     private MockMvc mockMvc;
+    @Mock
+    private BaseController baseController;
+    @InjectMocks
+    private GlobalControllerExceptionHandler globalControllerExceptionHandler;
 
     @BeforeEach
     void setUp() {
@@ -122,4 +135,36 @@ class HotelControllerTest {
         return updateHotelRequestDto;
     }
 
+    /**
+     * Unit tests for GlobalControllerExceptionHandler
+     */
+    @Test
+    void Should_ReturnInternalServerError_When_BookingIsFailedDueToInternalErrors(){
+        HillTopHotelApplicationException exception = new HillTopHotelApplicationException("Failed.");
+        ResponseEntity<ResponseWrapper> expectedResponse = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        // Mock the behavior of the baseController
+        when(baseController.getInternalServerError()).thenReturn(expectedResponse);
+
+        // Invoke the exception handler
+        ResponseEntity<ResponseWrapper> actualResponse = globalControllerExceptionHandler.hillTopUserApplicationException(exception);
+
+        // Verify the interactions and assertions
+        verify(baseController, times(1)).getInternalServerError();
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, actualResponse.getStatusCode());
+        assertEquals(expectedResponse.getBody(), actualResponse.getBody());
+    }
+
+    /**
+     *
+     */
+    @Test
+    void testDataNotFoundException() {
+        String errorMessage = "Data not found!";
+        // Act and Assert
+        DataNotFoundException exception = assertThrows(DataNotFoundException.class, () -> {
+            throw new DataNotFoundException(errorMessage);
+        });
+        assertEquals(errorMessage, exception.getMessage());
+    }
 }

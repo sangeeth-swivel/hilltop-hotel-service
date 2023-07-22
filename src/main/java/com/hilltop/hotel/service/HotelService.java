@@ -5,8 +5,11 @@ import com.hilltop.hotel.domain.entity.Room;
 import com.hilltop.hotel.domain.request.HotelRequestDto;
 import com.hilltop.hotel.domain.request.UpdateHotelRequestDto;
 import com.hilltop.hotel.exception.DataNotFoundException;
+import com.hilltop.hotel.exception.ExistingNameException;
+import com.hilltop.hotel.exception.HillTopHotelApplicationException;
 import com.hilltop.hotel.repository.HotelRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,13 +28,40 @@ public class HotelService {
         this.hotelRepository = hotelRepository;
     }
 
+    /**
+     * This method saves new hotel into database
+     *
+     * @param hotelRequestDto hotelRequestDto
+     */
     public void addHotel(HotelRequestDto hotelRequestDto) {
+        String hotelName = hotelRequestDto.getHotelName();
+        boolean existsByName = isHotelNameExist(hotelName);
+        if (existsByName) {
+            log.debug("Hotel with the name '{}' already exists. Cannot add duplicate.", hotelName);
+            throw new ExistingNameException("Hotel name exist in database");
+        }
         hotelRepository.save(new Hotel(hotelRequestDto));
         log.debug("Successfully added hotel data.");
     }
 
+    /**
+     * This method finds if the hotel exists by the given name
+     *
+     * @param hotelName hotelName
+     * @return true/false
+     */
+    private boolean isHotelNameExist(String hotelName) {
+        return hotelRepository.existsByHotelName(hotelName);
+    }
+
     public void updateHotel(UpdateHotelRequestDto updateHotelRequestDto) {
         Hotel hotel = getHotelById(updateHotelRequestDto.getId());
+        String hotelName = updateHotelRequestDto.getHotelName();
+        boolean existsByName = isHotelNameExist(hotelName);
+        if (existsByName) {
+            log.debug("Hotel with the name '{}' already exists. Cannot add duplicate.", hotelName);
+            throw new ExistingNameException("Hotel name exist in database");
+        }
         hotel.updateHotel(updateHotelRequestDto);
         hotelRepository.save(hotel);
         log.debug("Successfully updated hotel data.");

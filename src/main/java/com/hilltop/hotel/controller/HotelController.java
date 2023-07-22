@@ -8,6 +8,7 @@ import com.hilltop.hotel.domain.response.HotelListResponseDto;
 import com.hilltop.hotel.domain.response.ResponseWrapper;
 import com.hilltop.hotel.enums.ErrorMessage;
 import com.hilltop.hotel.enums.SuccessMessage;
+import com.hilltop.hotel.exception.ExistingNameException;
 import com.hilltop.hotel.service.HotelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,24 +34,32 @@ public class HotelController extends BaseController {
 
     @PostMapping("")
     public ResponseEntity<ResponseWrapper> addHotel(@RequestBody HotelRequestDto hotelRequestDto) {
-        if (!hotelRequestDto.isRequiredFieldsAvailable()) {
-            log.debug("Required fields missing. data: {}", hotelRequestDto.toLogJson());
-            return getBadRequestErrorResponse(ErrorMessage.MISSING_REQUIRED_FIELDS);
+        try {
+            if (!hotelRequestDto.isRequiredFieldsAvailable()) {
+                log.debug("Required fields missing. data: {}", hotelRequestDto.toLogJson());
+                return getBadRequestErrorResponse(ErrorMessage.MISSING_REQUIRED_FIELDS);
+            }
+            hotelService.addHotel(hotelRequestDto);
+            return getSuccessResponse(SuccessMessage.SUCCESSFULLY_ADDED, null, HttpStatus.CREATED);
+        } catch (ExistingNameException e) {
+            log.error("Hotel name already exists. Cannot add duplicate.", e);
+            return getBadRequestErrorResponse(ErrorMessage.EXISTING_NAME);
         }
-        hotelService.addHotel(hotelRequestDto);
-        return getSuccessResponse(SuccessMessage.SUCCESSFULLY_ADDED, null, HttpStatus.CREATED);
-
     }
 
     @PutMapping("")
     public ResponseEntity<ResponseWrapper> updateHotel(@RequestBody UpdateHotelRequestDto updateHotelRequestDto) {
-        if (!updateHotelRequestDto.isRequiredFieldsAvailableForUpdate()) {
-            log.debug("Required fields missing. data: {}", updateHotelRequestDto.toLogJson());
-            return getBadRequestErrorResponse(ErrorMessage.MISSING_REQUIRED_FIELDS);
+        try {
+            if (!updateHotelRequestDto.isRequiredFieldsAvailableForUpdate()) {
+                log.debug("Required fields missing. data: {}", updateHotelRequestDto.toLogJson());
+                return getBadRequestErrorResponse(ErrorMessage.MISSING_REQUIRED_FIELDS);
+            }
+            hotelService.updateHotel(updateHotelRequestDto);
+            return getSuccessResponse(SuccessMessage.SUCCESSFULLY_UPDATED, null, HttpStatus.OK);
+        }catch (ExistingNameException e) {
+            log.error("Hotel name already exists. Cannot add duplicate.", e);
+            return getBadRequestErrorResponse(ErrorMessage.EXISTING_NAME);
         }
-        hotelService.updateHotel(updateHotelRequestDto);
-        return getSuccessResponse(SuccessMessage.SUCCESSFULLY_UPDATED, null, HttpStatus.OK);
-
     }
 
     @GetMapping("")

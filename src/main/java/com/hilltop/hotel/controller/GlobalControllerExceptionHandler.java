@@ -29,4 +29,5 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
         log.debug("Data not found. {}", exception.getMessage());
         return baseController.getInternalServerError();
     }
+
 }

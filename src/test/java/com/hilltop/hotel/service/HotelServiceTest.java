@@ -3,6 +3,7 @@ package com.hilltop.hotel.service;
 import com.hilltop.hotel.domain.entity.Hotel;
 import com.hilltop.hotel.domain.entity.Room;
 import com.hilltop.hotel.domain.request.UpdateHotelRequestDto;
+import com.hilltop.hotel.exception.ExistingNameException;
 import com.hilltop.hotel.repository.HotelRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -99,4 +101,10 @@ class HotelServiceTest {
         return room;
     }
 
+    @Test
+    public void TestExistingNameException() {
+        String errorMessage = "Name already exists!";
+        ExistingNameException exception = new ExistingNameException(errorMessage);
+        assertEquals(errorMessage, exception.getMessage(), "Hotel name exist in database.");
+    }
 }

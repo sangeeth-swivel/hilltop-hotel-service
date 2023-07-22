@@ -10,7 +10,7 @@
 
 ## Postman collection
 
-* 
+* https://blue-space-9416.postman.co/workspace/My-Workspace~14096feb-5765-4f2e-8bb5-c246fcd40e8d/folder/10562103-b10a55a0-97ae-4065-bc76-3784a9d8706a?ctx=documentation
 
 ## Requirements
 

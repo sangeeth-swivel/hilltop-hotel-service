@@ -1,10 +1,12 @@
 package com.hilltop.hotel.domain.request;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class RoomTypeRequestDto implements RequestDto {
 
     private String roomName;
