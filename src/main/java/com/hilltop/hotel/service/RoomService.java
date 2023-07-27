@@ -1,6 +1,5 @@
 package com.hilltop.hotel.service;
 
-import com.hilltop.hotel.domain.entity.Hotel;
 import com.hilltop.hotel.domain.entity.Room;
 import com.hilltop.hotel.domain.entity.RoomType;
 import com.hilltop.hotel.domain.request.RoomRequestDto;
@@ -10,9 +9,12 @@ import com.hilltop.hotel.exception.HillTopHotelApplicationException;
 import com.hilltop.hotel.repository.RoomRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Room service
@@ -37,14 +39,9 @@ public class RoomService {
      * @param roomRequestDto roomRequestDto
      */
     public void addRoom(RoomRequestDto roomRequestDto) {
-        try {
-            Hotel hotel = hotelService.getHotelById(roomRequestDto.getHotelId());
-            RoomType roomType = roomTypeService.getRoomTypeById(roomRequestDto.getRoomTypeId());
-            roomRepository.save(new Room(roomRequestDto, hotel, roomType));
-            log.debug("Successfully added room data.");
-        } catch (DataAccessException e) {
-            throw new HillTopHotelApplicationException("Failed to save room details on database.", e);
-        }
+        RoomType roomType = roomTypeService.getRoomTypeById(roomRequestDto.getRoomTypeId());
+        roomRepository.save(new Room(roomRequestDto, roomType));
+        log.debug("Successfully added room data.");
     }
 
     /**
@@ -53,16 +50,11 @@ public class RoomService {
      * @param updateRoomRequestDto updateRoomRequestDto
      */
     public void updateRoom(UpdateRoomRequestDto updateRoomRequestDto) {
-        try {
-            Room room = getRoomById(updateRoomRequestDto.getId());
-            Hotel hotel = hotelService.getHotelById(updateRoomRequestDto.getHotelId());
-            RoomType roomType = roomTypeService.getRoomTypeById(updateRoomRequestDto.getRoomTypeId());
-            room.updateRoom(updateRoomRequestDto, hotel, roomType);
-            roomRepository.save(room);
-            log.debug("Successfully updated room data.");
-        } catch (DataAccessException e) {
-            throw new HillTopHotelApplicationException("Failed to update room info in database.", e);
-        }
+        Room room = getRoomById(updateRoomRequestDto.getId());
+        RoomType roomType = roomTypeService.getRoomTypeById(updateRoomRequestDto.getRoomTypeId());
+        room.updateRoom(updateRoomRequestDto, roomType);
+        roomRepository.save(room);
+        log.debug("Successfully updated room data.");
     }
 
     /**
@@ -71,12 +63,8 @@ public class RoomService {
      * @param roomId roomId
      */
     public void deleteRoomById(String roomId) {
-        try {
-            roomRepository.deleteById(roomId);
-            log.debug("Successfully deleted room.");
-        } catch (DataAccessException e) {
-            throw new HillTopHotelApplicationException("Failed to delete room from database.", e);
-        }
+        roomRepository.deleteById(roomId);
+        log.debug("Successfully deleted room.");
     }
 
     /**
@@ -87,13 +75,9 @@ public class RoomService {
      * @return room list.
      */
     public List<Room> getRoomListByHotelIdAndSearchTerm(String hotelId, String searchTerm) {
-        try {
-            if (searchTerm == null)
-                return roomRepository.findAllByHotelId(hotelId);
-            return roomRepository.findAllByHotelIdAndRoomNoContaining(hotelId, searchTerm);
-        } catch (DataAccessException e) {
-            throw new HillTopHotelApplicationException("Failed to get all room data from database.", e);
-        }
+        if (searchTerm == null)
+            return roomRepository.findAllByHotelId(hotelId);
+        return roomRepository.findAllByHotelIdAndRoomNoContaining(hotelId, searchTerm);
     }
 
     /**
@@ -103,11 +87,94 @@ public class RoomService {
      * @return room details.
      */
     public Room getRoomById(String roomId) {
+        return roomRepository.findById(roomId)
+                .orElseThrow(() -> new DataNotFoundException("Room not found for roomId: " + roomId));
+    }
+
+    public Page<Room> getRoomPageByHotelId(Pageable pageable, String hotelId) {
+        return roomRepository.findByHotelId(pageable, hotelId);
+    }
+
+    public Map<String, List<Room>> getRoomsForPaxCountAndHotelIds(int paxCount, List<String> hotelIds) {
         try {
-            return roomRepository.findById(roomId)
-                    .orElseThrow(() -> new DataNotFoundException("Room not found for roomId: " + roomId));
+            Map<String, List<Room>> hotelAndRoomsMap = new HashMap<>();
+            for (String id : hotelIds) {
+                List<Room> rooms = getRoomsByHotelId(id);
+                List<Room> searchList = rooms
+                        .stream().filter(room -> room.getPaxCount() == paxCount).collect(Collectors.toList());
+                if (searchList.isEmpty()) {
+                    searchList = findRoomsForExtraPaxCount(new HashSet<>(rooms), paxCount);
+                }
+                if (!searchList.isEmpty()) {
+                    hotelAndRoomsMap.put(id, searchList);
+                }
+            }
+            return hotelAndRoomsMap;
         } catch (DataAccessException e) {
-            throw new HillTopHotelApplicationException("Failed to get room info from database.", e);
+            throw new HillTopHotelApplicationException("Failed to get room list by hotel ids and pax count from database.", e);
+        }
+    }
+
+    /**
+     * This method used to get room list by extra pax count.
+     * This method returns room that can occupy extra pax count : Eg: Pax count is 5 then
+     * this method will return rooms for that can occupy pax count: 6
+     *
+     * @param roomSet  roomSet
+     * @param paxCount paxCount
+     * @return Room List
+     */
+    public List<Room> findRoomsForExtraPaxCount(Set<Room> roomSet, int paxCount) {
+        List<Room> searchList = roomSet.stream()
+                .filter(room -> room.getPaxCount() >
+                        paxCount && room.getPaxCount() <= paxCount + 1)
+                .collect(Collectors.toList());
+        if (searchList.isEmpty()) {
+            Optional<Room> optionalRoom = roomSet
+                    .stream().filter(room -> room.getPaxCount() < paxCount).max(Comparator.comparing(Room::getPaxCount));
+            if (optionalRoom.isPresent()) {
+                searchList = findMultipleRoomsForPaxCount(optionalRoom.get(), roomSet, paxCount);
+            }
+        }
+        return searchList;
+    }
+
+    /**
+     * This method return the combination of rooms:
+     * Eg: PaxCount = 3 ; Then room will return pax count 1 and 2 rooms.
+     *
+     * @param maximumPaxRoom maximumPaxRoom
+     * @param roomSet        roomSet
+     * @param paxCount       paxCount
+     * @return Room List
+     */
+    public List<Room> findMultipleRoomsForPaxCount(Room maximumPaxRoom, Set<Room> roomSet, int paxCount) {
+        List<Room> searchRoomList = new ArrayList<>();
+        searchRoomList.add(maximumPaxRoom);
+        int totalPaxCount = maximumPaxRoom.getPaxCount();
+        List<Room> sortedRoomList = roomSet.stream()
+                .filter(room -> !room.equals(maximumPaxRoom))
+                .sorted(Comparator.comparing(Room::getPaxCount).reversed())
+                .collect(Collectors.toList());
+        for (Room room : sortedRoomList) {
+            int roomPaxCount = room.getPaxCount();
+            if (totalPaxCount + roomPaxCount <= paxCount) {
+                searchRoomList.add(room);
+                totalPaxCount += roomPaxCount;
+                if (totalPaxCount == paxCount) {
+                    break;
+                }
+            }
+        }
+        return totalPaxCount == paxCount ? searchRoomList : Collections.emptyList();
+    }
+
+    public List<Room> getRoomsByHotelId(String hotelId) {
+        try {
+            return roomRepository.findByHotelId(hotelId);
+        } catch (DataAccessException e) {
+            log.error("Failed to get room by hotel id: {}", hotelId);
+            throw new HillTopHotelApplicationException("Failed to get rooms by hotel id.", e);
         }
     }
 }

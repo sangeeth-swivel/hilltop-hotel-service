@@ -2,24 +2,33 @@ package com.hilltop.hotel.domain.response;
 
 import com.hilltop.hotel.domain.entity.Room;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Room responseDto
  */
 @Getter
+@Setter
 public class RoomResponseDto implements ResponseDto {
 
-    private final String id;
-    private final String roomNo;
-    private final String roomType;
-    private final int maxPeople;
-    private final double price;
+    private String id;
+    private int roomNo;
+    private String hotelId;
+    private String roomType;
+    private int paxCount;
+    private List<String> imageUrls;
+    private BigDecimal cost;
 
     public RoomResponseDto(Room room) {
         this.id = room.getId();
         this.roomNo = room.getRoomNo();
+        this.hotelId = room.getHotelId();
         this.roomType = room.getRoomType().getRoomName();
-        this.maxPeople = room.getMaxPeople();
-        this.price = room.getPrice();
+        this.paxCount = room.getPaxCount();
+        this.imageUrls = room.getImageUrls();
+        cost = room.getCost();
     }
 }

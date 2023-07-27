@@ -11,7 +11,6 @@ import lombok.Setter;
 public class UpdateHotelRequestDto extends HotelRequestDto {
 
     private String id;
-
     public boolean isRequiredFieldsAvailableForUpdate() {
         return isNonEmpty(id) && isRequiredFieldsAvailable();
     }

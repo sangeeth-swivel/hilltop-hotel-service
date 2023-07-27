@@ -1,6 +1,8 @@
 package com.hilltop.hotel.repository;
 
 import com.hilltop.hotel.domain.entity.Room;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -26,5 +28,9 @@ public interface RoomRepository extends JpaRepository<Room, String> {
      * @return room list.
      */
     List<Room> findAllByHotelIdAndRoomNoContaining(String hotelId, String roomNo);
+
+    Page<Room> findByHotelId(Pageable pageable, String hotelId);
+
+    List<Room> findByHotelId(String hotelId);
 
 }

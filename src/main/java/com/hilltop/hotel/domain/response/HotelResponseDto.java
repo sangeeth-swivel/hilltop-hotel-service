@@ -2,11 +2,9 @@ package com.hilltop.hotel.domain.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hilltop.hotel.domain.entity.Hotel;
-import com.hilltop.hotel.domain.entity.Room;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Hotel responseDto
@@ -14,22 +12,23 @@ import java.util.stream.Collectors;
 @Getter
 public class HotelResponseDto implements ResponseDto {
 
-    private final String id;
-    private final String name;
-    private final String location;
+    private String id;
+    private String hotelName;
+    private String hotelLocation;
+    private String city;
+    private List<String> imageUrl;
+    private String contact;
+    private String email;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<RoomResponseDto> rooms;
 
     public HotelResponseDto(Hotel hotel) {
         this.id = hotel.getId();
-        this.name = hotel.getHotelName();
-        this.location = hotel.getHotelLocation();
-    }
-
-    public HotelResponseDto(Hotel hotel, List<Room> roomList) {
-        this.id = hotel.getId();
-        this.name = hotel.getHotelName();
-        this.location = hotel.getHotelLocation();
-        this.rooms = roomList.stream().map(RoomResponseDto::new).collect(Collectors.toList());
+        this.hotelName = hotel.getHotelName();
+        this.hotelLocation = hotel.getHotelLocation();
+        this.city = hotel.getCity();
+        this.imageUrl = hotel.getImageUrl();
+        this.contact = hotel.getContact();
+        this.email = hotel.getEmail();
     }
 }

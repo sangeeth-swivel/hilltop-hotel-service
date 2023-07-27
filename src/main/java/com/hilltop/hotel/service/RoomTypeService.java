@@ -3,10 +3,8 @@ package com.hilltop.hotel.service;
 import com.hilltop.hotel.domain.entity.RoomType;
 import com.hilltop.hotel.domain.request.RoomTypeRequestDto;
 import com.hilltop.hotel.exception.DataNotFoundException;
-import com.hilltop.hotel.exception.HillTopHotelApplicationException;
 import com.hilltop.hotel.repository.RoomTypeRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,14 +27,10 @@ public class RoomTypeService {
      * @return roomType.
      */
     public RoomType addRoomType(RoomTypeRequestDto roomTypeRequestDto) {
-        try {
             RoomType roomType = new RoomType(roomTypeRequestDto);
             roomTypeRepository.save(roomType);
             log.debug("Successfully added room type.");
             return roomType;
-        } catch (DataAccessException e) {
-            throw new HillTopHotelApplicationException("Failed to save room type on database.", e);
-        }
     }
 
     /**
@@ -46,11 +40,7 @@ public class RoomTypeService {
      * @return roomType.
      */
     public RoomType getRoomTypeById(String id) {
-        try {
             return roomTypeRepository.findById(id)
                     .orElseThrow(() -> new DataNotFoundException("Room type not found for id: " + id));
-        } catch (DataAccessException e) {
-            throw new HillTopHotelApplicationException("Failed to get room type from database.", e);
-        }
     }
 }

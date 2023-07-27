@@ -1,15 +1,15 @@
 package com.hilltop.hotel.service;
 
 import com.hilltop.hotel.domain.entity.Hotel;
-import com.hilltop.hotel.domain.entity.Room;
 import com.hilltop.hotel.domain.request.HotelRequestDto;
 import com.hilltop.hotel.domain.request.UpdateHotelRequestDto;
+import com.hilltop.hotel.domain.response.HotelResponseDto;
 import com.hilltop.hotel.exception.DataNotFoundException;
 import com.hilltop.hotel.exception.ExistingNameException;
-import com.hilltop.hotel.exception.HillTopHotelApplicationException;
 import com.hilltop.hotel.repository.HotelRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -67,76 +67,29 @@ public class HotelService {
         log.debug("Successfully updated hotel data.");
     }
 
-    public List<Hotel> getHotelList() {
-        return hotelRepository.findAll();
-    }
-
     public Hotel getHotelById(String id) {
         return hotelRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Hotel not found for id: " + id));
     }
 
-    public Map<Hotel, List<Room>> getHotelsByLocationAndPaxCount(String location, int paxCount) {
-        List<Hotel> hotelList = hotelRepository.findByHotelLocation(location);
-        Map<Hotel, List<Room>> hotelAndRoomsMap = new HashMap<>();
-        for (Hotel hotel : hotelList) {
-            List<Room> sortedRoomList = hotel.getRooms().stream()
-                    .filter(room -> room.getMaxPeople() == paxCount).collect(Collectors.toList());
-            if (sortedRoomList.isEmpty())
-                sortedRoomList = getPossibleRoomsForPaxCount(hotel.getRooms(), paxCount);
-            if (!sortedRoomList.isEmpty())
-                hotelAndRoomsMap.put(hotel, sortedRoomList);
-        }
-        return hotelAndRoomsMap;
+    public Page<Hotel> getAllHotel(Pageable pageable) {
+        return hotelRepository.findAll(pageable);
     }
 
-    /**
-     * This method is used to get possible rooms for pax count.
-     *
-     * @param roomSet  roomSet
-     * @param paxCount paxCount
-     * @return room list
-     */
-    private List<Room> getPossibleRoomsForPaxCount(Set<Room> roomSet, int paxCount) {
-        List<Room> sortedRoomList = roomSet.stream()
-                .filter(room -> room.getMaxPeople() > paxCount && room.getMaxPeople() <= paxCount + 2)
-                .collect(Collectors.toList());
-        if (sortedRoomList.isEmpty()) {
-            Optional<Room> optionalRoom = roomSet.stream()
-                    .filter(room -> room.getMaxPeople() < paxCount)
-                    .findFirst();
-            if (optionalRoom.isPresent()) {
-                sortedRoomList = getRoomCombination(optionalRoom.get(), roomSet, paxCount);
-            }
-        }
-        return sortedRoomList;
+    public List<String> getAllCities() {
+        List<Hotel> allHotels = hotelRepository.findAll();
+        return allHotels.stream().map(Hotel::getCity).collect(Collectors.toList());
     }
 
-    /**
-     * This method is used to return multiple rooms to fulfill pax count.
-     *
-     * @param possibleMaximumPaxRoom possibleMaximumPaxRoom
-     * @param roomSet                roomSet
-     * @param paxCount               paxCount
-     * @return room list
-     */
-    private List<Room> getRoomCombination(Room possibleMaximumPaxRoom, Set<Room> roomSet, int paxCount) {
-        List<Room> sortedRoomList = new ArrayList<>();
-        sortedRoomList.add(possibleMaximumPaxRoom);
-        int totalPaxCount = possibleMaximumPaxRoom.getMaxPeople();
-        List<Room> paxCountDescendingRoomList = roomSet.stream()
-                .sorted(Comparator.comparing(Room::getMaxPeople).reversed())
-                .filter(room -> !room.equals(possibleMaximumPaxRoom))
-                .collect(Collectors.toList());
-        for (Room room : paxCountDescendingRoomList) {
-            while (totalPaxCount + room.getMaxPeople() <= paxCount) {
-                sortedRoomList.add(room);
-                totalPaxCount += room.getMaxPeople();
-                if (totalPaxCount == paxCount)
-                    return sortedRoomList;
-            }
-        }
-        return List.of();
+    public List<HotelResponseDto> getHotelsByCity(String city) {
+        List<Hotel> allByCity = hotelRepository.findAllByCity(city);
+        return allByCity.stream().map(HotelResponseDto::new).collect(Collectors.toList());
+    }
+
+    public void deleteHotel(String id) {
+        var hotel = getHotelById(id);
+        hotelRepository.delete(hotel);
+        log.info("Successfully deleted the hotel by id: {}", id);
     }
 
 }

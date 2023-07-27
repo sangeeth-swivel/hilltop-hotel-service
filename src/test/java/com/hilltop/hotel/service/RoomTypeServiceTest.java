@@ -44,15 +44,6 @@ class RoomTypeServiceTest {
         verify(roomTypeRepository, times(1)).save(any());
     }
 
-    @Test
-    void Should_ThrowHillTopHotelApplicationException_When_FailedToAddRoomTypeData() {
-        when(roomTypeRepository.save(any())).thenThrow(new DataAccessException(FAILED) {
-        });
-        HillTopHotelApplicationException exception = assertThrows(HillTopHotelApplicationException.class,
-                () -> roomTypeService.addRoomType(roomTypeRequestDto));
-        assertEquals("Failed to save room type on database.", exception.getMessage());
-    }
-
     /**
      * Unit tests for getRoomTypeById() method.
      */
@@ -62,15 +53,6 @@ class RoomTypeServiceTest {
         DataNotFoundException exception = assertThrows(DataNotFoundException.class,
                 () -> roomTypeService.getRoomTypeById("rtid-123"));
         assertEquals("Room type not found for id: rtid-123", exception.getMessage());
-    }
-
-    @Test
-    void Should_ThrowHillTopHotelApplicationException_When_FailedToGetRoomTypeById() {
-        when(roomTypeRepository.findById(anyString())).thenThrow(new DataAccessException(FAILED) {
-        });
-        HillTopHotelApplicationException exception = assertThrows(HillTopHotelApplicationException.class,
-                () -> roomTypeService.getRoomTypeById("rtid-123"));
-        assertEquals("Failed to get room type from database.", exception.getMessage());
     }
 
     /**

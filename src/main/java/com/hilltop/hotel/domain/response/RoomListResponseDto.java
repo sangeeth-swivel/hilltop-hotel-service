@@ -3,7 +3,9 @@ package com.hilltop.hotel.domain.response;
 import com.hilltop.hotel.domain.entity.Room;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -12,9 +14,22 @@ import java.util.stream.Collectors;
 @Getter
 public class RoomListResponseDto implements ResponseDto {
 
-    private final List<RoomResponseDto> roomList;
+    private transient List<RoomSearchResponseDto> list;
+    public RoomListResponseDto(Map<String, List<Room>> dataMap, int days) {
+        list = generateResponse(dataMap, days);
+    }
+    private List<RoomSearchResponseDto> generateResponse(Map<String, List<Room>> dataMap, int days) {
+        List<RoomSearchResponseDto> roomSearchResponseDtoList = new ArrayList<>();
 
-    public RoomListResponseDto(List<Room> roomList) {
-        this.roomList = roomList.stream().map(RoomResponseDto::new).collect(Collectors.toList());
+        for (Map.Entry<String, List<Room>> entry : dataMap.entrySet()) {
+            String id = entry.getKey();
+            List<RoomResponseDto> roomsList = entry.getValue()
+                    .stream()
+                    .map(RoomResponseDto::new)
+                    .collect(Collectors.toList());
+            RoomSearchResponseDto roomSearchResponseDto = new RoomSearchResponseDto(id, roomsList ,days);
+            roomSearchResponseDtoList.add(roomSearchResponseDto);
+        }
+        return roomSearchResponseDtoList;
     }
 }

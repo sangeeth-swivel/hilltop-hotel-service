@@ -5,20 +5,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomRequestDto implements RequestDto {
 
-    private String roomNo;
+    private int roomNo;
     private String hotelId;
     private String roomTypeId;
-    private int maxPeople;
-    private double cost;
-
+    private int paxCount;
+    private BigDecimal perNight;
+    private List<String> imageUrls;
+    private String city;
     @Override
     public boolean isRequiredFieldsAvailable() {
-        return isNonEmpty(hotelId) && isNonEmpty(roomNo) && isNonEmpty(roomTypeId) && maxPeople > 0 && cost > 0;
+        return roomNo > 0 && isNonEmpty(hotelId) && paxCount > 0 && isNonEmpty(roomTypeId);
     }
 }

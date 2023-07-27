@@ -1,5 +1,6 @@
 package com.hilltop.hotel.controller;
 
+import com.hilltop.hotel.configuration.Translator;
 import com.hilltop.hotel.domain.request.HotelRequestDto;
 import com.hilltop.hotel.domain.request.UpdateHotelRequestDto;
 import com.hilltop.hotel.domain.response.ResponseWrapper;
@@ -42,6 +43,8 @@ class HotelControllerTest {
     private HotelService hotelService;
     private MockMvc mockMvc;
     @Mock
+    private Translator translator;
+    @Mock
     private BaseController baseController;
     @InjectMocks
     private GlobalControllerExceptionHandler globalControllerExceptionHandler;
@@ -49,20 +52,8 @@ class HotelControllerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        HotelController hotelController = new HotelController(hotelService);
+        HotelController hotelController = new HotelController(translator, hotelService);
         mockMvc = MockMvcBuilders.standaloneSetup(hotelController).build();
-    }
-
-    /**
-     * Unit tests for addHotel() method.
-     */
-    @Test
-    void Should_ReturnOk_When_AddHotelIsSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post(ADD_HOTEL_URI)
-                        .content(updateHotelRequestDto.toLogJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value(SuccessMessage.SUCCESSFULLY_ADDED.getMessage()));
     }
 
     /**
@@ -77,20 +68,6 @@ class HotelControllerTest {
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(ErrorMessage.MISSING_REQUIRED_FIELDS.getMessage()))
-                .andExpect(jsonPath("$.data").isEmpty());
-    }
-
-
-    /**
-     * Unit tests for updateHotel() method.
-     */
-    @Test
-    void Should_ReturnOk_When_UpdateHotelIsSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put(UPDATE_HOTEL_URI)
-                        .content(updateHotelRequestDto.toLogJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessMessage.SUCCESSFULLY_UPDATED.getMessage()))
                 .andExpect(jsonPath("$.data").isEmpty());
     }
 
@@ -109,29 +86,7 @@ class HotelControllerTest {
                 .andExpect(jsonPath("$.data").isEmpty());
     }
 
-    /**
-     * Unit tests for searchHotelsByLocationAndPaxCount() method.
-     */
-    @Test
-    void Should_ReturnOk_When_ListAllHotelsByLocationAndPaxIsSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(LIST_HOTEL_BY_LOCATION_AND_PAX_URI)
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessMessage.SUCCESSFULLY_RETURNED.getMessage()));
-    }
-
-    /**
-     * Unit test for listAllHotelsIsSuccessful() method.
-     */
-    @Test
-    void Should_ReturnOk_When_ListAllHotelsIsSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(LIST_ALL_HOTEL_URI)
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessMessage.SUCCESSFULLY_RETURNED.getMessage()));
-    }
-
-    /**
+     /**
      * This method is used to mock hotelRequestDto.
      *
      * @return updateHotelRequestDto

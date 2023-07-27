@@ -1,5 +1,6 @@
 package com.hilltop.hotel.controller;
 
+import com.hilltop.hotel.configuration.Translator;
 import com.hilltop.hotel.domain.entity.RoomType;
 import com.hilltop.hotel.domain.request.RoomTypeRequestDto;
 import com.hilltop.hotel.domain.response.ResponseWrapper;
@@ -22,7 +23,8 @@ public class RoomTypeController extends BaseController {
 
     private final RoomTypeService roomTypeService;
 
-    public RoomTypeController(RoomTypeService roomTypeService) {
+    public RoomTypeController(Translator translator, RoomTypeService roomTypeService) {
+        super(translator);
         this.roomTypeService = roomTypeService;
     }
 

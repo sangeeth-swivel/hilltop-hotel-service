@@ -28,8 +28,8 @@ class HotelResponseDtoTest {
 
         HotelResponseDto hotelResponseDto = new HotelResponseDto(hotel);
 
-        assertEquals(hotelName, hotelResponseDto.getName(), "Hotel name should be set correctly.");
-        assertEquals(hotelLocation, hotelResponseDto.getLocation(), "Hotel location should be set correctly.");
+        assertEquals(hotelName, hotelResponseDto.getHotelName(), "Hotel name should be set correctly.");
+        assertEquals(hotelLocation, hotelResponseDto.getHotelLocation(), "Hotel location should be set correctly.");
 
         assertNull(hotelResponseDto.getRooms(), "Rooms list should be initialized as null.");
     }

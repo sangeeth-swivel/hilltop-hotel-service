@@ -1,5 +1,6 @@
 package com.hilltop.hotel.controller;
 
+import com.hilltop.hotel.configuration.Translator;
 import com.hilltop.hotel.domain.entity.RoomType;
 import com.hilltop.hotel.domain.request.RoomTypeRequestDto;
 import com.hilltop.hotel.enums.ErrorMessage;
@@ -29,12 +30,14 @@ class RoomTypeControllerTest {
     private final RoomTypeRequestDto roomTypeRequestDto = getRoomTypeRequestDto();
     @Mock
     private RoomTypeService roomTypeService;
+    @Mock
+    private Translator translator;
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         openMocks(this);
-        RoomTypeController roomTypeController = new RoomTypeController(roomTypeService);
+        RoomTypeController roomTypeController = new RoomTypeController(translator, roomTypeService);
         mockMvc = MockMvcBuilders.standaloneSetup(roomTypeController).build();
     }
 

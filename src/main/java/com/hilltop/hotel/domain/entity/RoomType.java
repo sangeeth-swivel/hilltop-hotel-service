@@ -15,7 +15,7 @@ import java.util.UUID;
  * Room type entity
  */
 @Entity
-@Table
+@Table(name = "room_type")
 @Getter
 @Setter
 @NoArgsConstructor

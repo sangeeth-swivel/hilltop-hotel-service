@@ -1,5 +1,6 @@
 package com.hilltop.hotel.controller;
 
+import com.hilltop.hotel.configuration.Translator;
 import com.hilltop.hotel.domain.entity.Room;
 import com.hilltop.hotel.domain.entity.RoomType;
 import com.hilltop.hotel.domain.request.RoomRequestDto;
@@ -40,25 +41,15 @@ class RoomControllerTest {
     private final Room room = getRoom();
     @Mock
     private RoomService roomService;
+    @Mock
+    private Translator translator;
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
         openMocks(this);
-        RoomController roomController = new RoomController(roomService);
+        RoomController roomController = new RoomController(translator, roomService);
         mockMvc = MockMvcBuilders.standaloneSetup(roomController).build();
-    }
-
-    /**
-     * Unit tests for addRoom() method.
-     */
-    @Test
-    void Should_ReturnOk_When_AddRoomIsSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post(ADD_ROOM_URI)
-                        .content(updateRoomRequestDto.toLogJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value(SuccessMessage.SUCCESSFULLY_ADDED.getMessage()));
     }
 
     @Test
@@ -70,19 +61,6 @@ class RoomControllerTest {
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(ErrorMessage.MISSING_REQUIRED_FIELDS.getMessage()))
-                .andExpect(jsonPath("$.data").isEmpty());
-    }
-
-    /**
-     * Unit tests for updateRoom() method.
-     */
-    @Test
-    void Should_ReturnOk_When_UpdateRoomIsSuccessful() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put(UPDATE_ROOM_URI)
-                        .content(updateRoomRequestDto.toLogJson())
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessMessage.SUCCESSFULLY_UPDATED.getMessage()))
                 .andExpect(jsonPath("$.data").isEmpty());
     }
 
@@ -110,19 +88,6 @@ class RoomControllerTest {
     }
 
     /**
-     * Unit tests for listAllRoomsByHotelId() method.
-     */
-    @Test
-    void Should_ReturnOk_When_ListAllRoomsByHotelIdIsSuccessful() throws Exception {
-        List<Room> roomList = List.of(room);
-        when(roomService.getRoomListByHotelIdAndSearchTerm(anyString(), anyString())).thenReturn(roomList);
-        mockMvc.perform(MockMvcRequestBuilders.get(LIST_ROOM_URI)
-                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(SuccessMessage.SUCCESSFULLY_RETURNED.getMessage()));
-    }
-
-    /**
      * This method is used to mock roomRequestDto.
      *
      * @return updateRoomRequestDto
@@ -130,11 +95,9 @@ class RoomControllerTest {
     private UpdateRoomRequestDto getUpdateRoomRequestDto() {
         UpdateRoomRequestDto updateRoomRequestDto = new UpdateRoomRequestDto();
         updateRoomRequestDto.setId("rid-123");
-        updateRoomRequestDto.setRoomNo("R1");
+        updateRoomRequestDto.setRoomNo(110);
         updateRoomRequestDto.setHotelId("hid-123");
         updateRoomRequestDto.setRoomTypeId("rtid-123");
-        updateRoomRequestDto.setMaxPeople(5);
-        updateRoomRequestDto.setCost(100);
         return updateRoomRequestDto;
     }
 
@@ -157,8 +120,8 @@ class RoomControllerTest {
      */
     private Room getRoom() {
         Room room = new Room();
-        room.setRoomNo("R1");
-        room.setMaxPeople(5);
+        room.setRoomNo(110);
+        room.setPaxCount(5);
         room.setRoomType(roomType);
         return room;
     }

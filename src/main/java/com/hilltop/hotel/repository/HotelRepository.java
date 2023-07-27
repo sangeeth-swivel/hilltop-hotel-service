@@ -11,26 +11,12 @@ import java.util.List;
 public interface HotelRepository extends JpaRepository<Hotel, String> {
 
     /**
-     * This method is used to find hotels by name.
-     *
-     * @param name hotel name
-     * @return hotel list.
-     */
-    List<Hotel> findByHotelNameContaining(String name);
-
-    /**
-     * This method is used to find hotels by location.
-     *
-     * @param location location
-     * @return hotel list.
-     */
-    List<Hotel> findByHotelLocation(String location);
-
-    /**
      * This method finds if the hotel exists by the given name
      *
      * @param name name
      * @return true/false
      */
     boolean existsByHotelName(String name);
+
+    List<Hotel> findAllByCity(String city);
 }
