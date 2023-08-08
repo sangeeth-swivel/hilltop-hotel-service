@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Hotel service
@@ -78,12 +77,12 @@ public class HotelService {
 
     public List<String> getAllCities() {
         List<Hotel> allHotels = hotelRepository.findAll();
-        return allHotels.stream().map(Hotel::getCity).collect(Collectors.toList());
+        return allHotels.stream().map(Hotel::getCity).toList();
     }
 
     public List<HotelResponseDto> getHotelsByCity(String city) {
         List<Hotel> allByCity = hotelRepository.findAllByCity(city);
-        return allByCity.stream().map(HotelResponseDto::new).collect(Collectors.toList());
+        return allByCity.stream().map(HotelResponseDto::new).toList();
     }
 
     public void deleteHotel(String id) {

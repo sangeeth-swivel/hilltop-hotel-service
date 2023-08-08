@@ -41,7 +41,7 @@ class HotelResponseDtoTest {
     }
 
     @Test
-    public void Should_ReturnHotelList() {
+    void Should_ReturnHotelList() {
         List<HotelResponseDto> hotels = new ArrayList<>();
         Hotel hotel = new Hotel(hotelRequestDto);
         hotels.add(new HotelResponseDto(hotel));
@@ -50,7 +50,7 @@ class HotelResponseDtoTest {
     }
 
     @Test
-    public void Should_ReturnHotelResponsePagable() {
+    void Should_ReturnHotelResponsePagable() {
         Hotel hotel1 = new Hotel(hotelRequestDto);
         List<Hotel> hotelList = Arrays.asList(hotel1);
         Page<Hotel> hotelPage = new PageImpl<>(hotelList);

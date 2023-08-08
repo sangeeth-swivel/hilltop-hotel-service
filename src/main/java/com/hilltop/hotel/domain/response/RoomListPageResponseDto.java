@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Room List Page ResponseDto
@@ -21,6 +20,6 @@ public class RoomListPageResponseDto extends PageResponseDto {
     }
 
     private List<RoomResponseDto> generateRoomResponseList(Page<Room> rooms) {
-        return rooms.getContent().stream().map(RoomResponseDto::new).collect(Collectors.toList());
+        return rooms.getContent().stream().map(RoomResponseDto::new).toList();
     }
 }

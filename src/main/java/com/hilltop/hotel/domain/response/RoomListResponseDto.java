@@ -6,7 +6,6 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Room list responseDto
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 @Getter
 public class RoomListResponseDto implements ResponseDto {
 
-    private transient List<RoomSearchResponseDto> list;
+    private List<RoomSearchResponseDto> list;
     public RoomListResponseDto(Map<String, List<Room>> dataMap, int days) {
         list = generateResponse(dataMap, days);
     }
@@ -26,7 +25,7 @@ public class RoomListResponseDto implements ResponseDto {
             List<RoomResponseDto> roomsList = entry.getValue()
                     .stream()
                     .map(RoomResponseDto::new)
-                    .collect(Collectors.toList());
+                    .toList();
             RoomSearchResponseDto roomSearchResponseDto = new RoomSearchResponseDto(id, roomsList ,days);
             roomSearchResponseDtoList.add(roomSearchResponseDto);
         }

@@ -1,6 +1,5 @@
 package com.hilltop.hotel.domain.response;
 
-import com.hilltop.hotel.domain.entity.Hotel;
 import com.hilltop.hotel.domain.entity.Room;
 import com.hilltop.hotel.domain.entity.RoomType;
 import com.hilltop.hotel.domain.request.HotelRequestDto;
@@ -66,7 +65,7 @@ class RoomResponseDtoTest {
     }
 
     @Test
-    public void Should_GenerateRoomCostForGivenPeriods() {
+    void Should_GenerateRoomCostForGivenPeriods() {
         String hotelId = "123";
         int days = 5;
         RoomType roomType = new RoomType(roomTypeRequestDto);
@@ -85,7 +84,7 @@ class RoomResponseDtoTest {
     }
 
     @Test
-    public void Should_GenerateResponse() {
+    void Should_GenerateResponse() {
         String hotelId1 = "hotel123";
         int days = 3;
 
@@ -113,7 +112,7 @@ class RoomResponseDtoTest {
     }
 
     @Test
-    public void Should_GenerateRoomResponseList() {
+    void Should_GenerateRoomResponseList() {
         RoomType roomType = new RoomType(roomTypeRequestDto);
         RoomType roomType2 = new RoomType(roomTypeRequestDto2);
         Room room1 = new Room(roomRequestDto, roomType);

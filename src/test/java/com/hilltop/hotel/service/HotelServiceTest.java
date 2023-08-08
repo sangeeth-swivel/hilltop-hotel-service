@@ -57,16 +57,6 @@ class HotelServiceTest {
     }
 
     /**
-     * Unit tests for getHotelList() method
-     */
-//    @Test
-//    void Should_RunFindAllQuery_When_GetHotelListIsCalled() {
-////        hotelService.getHotelList();
-//        hotelService.getAllHotel(Pageable.ofSize(1));
-//        verify(hotelRepository, times(1)).findAll();
-//    }
-
-    /**
      * This method is used to mock hotelRequestDto.
      *
      * @return updateHotelRequestDto
@@ -113,7 +103,7 @@ class HotelServiceTest {
     }
 
     @Test
-    public void Should_ReturnCities() {
+    void Should_ReturnCities() {
         List<String> cityNames = Arrays.asList("New York", "Los Angeles", "Chicago");
         CityListResponseDto responseDto = new CityListResponseDto(cityNames);
         Set<String> expectedCities = new HashSet<>(cityNames);
@@ -121,7 +111,7 @@ class HotelServiceTest {
     }
 
     @Test
-    public void Should_ReturnEmptyCityList() {
+    void Should_ReturnEmptyCityList() {
         List<String> emptyCityList = Arrays.asList();
         CityListResponseDto responseDto = new CityListResponseDto(emptyCityList);
         assertTrue(responseDto.getCities().isEmpty());

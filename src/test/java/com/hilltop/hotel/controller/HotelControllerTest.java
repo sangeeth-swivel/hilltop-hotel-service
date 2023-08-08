@@ -5,7 +5,6 @@ import com.hilltop.hotel.domain.request.HotelRequestDto;
 import com.hilltop.hotel.domain.request.UpdateHotelRequestDto;
 import com.hilltop.hotel.domain.response.ResponseWrapper;
 import com.hilltop.hotel.enums.ErrorMessage;
-import com.hilltop.hotel.enums.SuccessMessage;
 import com.hilltop.hotel.exception.DataNotFoundException;
 import com.hilltop.hotel.exception.HillTopHotelApplicationException;
 import com.hilltop.hotel.exception.InvalidHotelException;

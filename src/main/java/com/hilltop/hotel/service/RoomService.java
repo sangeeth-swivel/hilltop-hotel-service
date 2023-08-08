@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Room service
@@ -101,7 +100,7 @@ public class RoomService {
             for (String id : hotelIds) {
                 List<Room> rooms = getRoomsByHotelId(id);
                 List<Room> searchList = rooms
-                        .stream().filter(room -> room.getPaxCount() == paxCount).collect(Collectors.toList());
+                        .stream().filter(room -> room.getPaxCount() == paxCount).toList();
                 if (searchList.isEmpty()) {
                     searchList = findRoomsForExtraPaxCount(new HashSet<>(rooms), paxCount);
                 }
@@ -128,7 +127,7 @@ public class RoomService {
         List<Room> searchList = roomSet.stream()
                 .filter(room -> room.getPaxCount() >
                         paxCount && room.getPaxCount() <= paxCount + 1)
-                .collect(Collectors.toList());
+                .toList();
         if (searchList.isEmpty()) {
             Optional<Room> optionalRoom = roomSet
                     .stream().filter(room -> room.getPaxCount() < paxCount).max(Comparator.comparing(Room::getPaxCount));
@@ -155,7 +154,7 @@ public class RoomService {
         List<Room> sortedRoomList = roomSet.stream()
                 .filter(room -> !room.equals(maximumPaxRoom))
                 .sorted(Comparator.comparing(Room::getPaxCount).reversed())
-                .collect(Collectors.toList());
+                .toList();
         for (Room room : sortedRoomList) {
             int roomPaxCount = room.getPaxCount();
             if (totalPaxCount + roomPaxCount <= paxCount) {
