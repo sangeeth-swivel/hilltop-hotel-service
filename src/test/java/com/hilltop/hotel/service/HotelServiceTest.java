@@ -3,17 +3,17 @@ package com.hilltop.hotel.service;
 import com.hilltop.hotel.domain.entity.Hotel;
 import com.hilltop.hotel.domain.entity.Room;
 import com.hilltop.hotel.domain.request.UpdateHotelRequestDto;
+import com.hilltop.hotel.domain.response.CityListResponseDto;
 import com.hilltop.hotel.exception.ExistingNameException;
 import com.hilltop.hotel.repository.HotelRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -110,5 +110,20 @@ class HotelServiceTest {
         String errorMessage = "Name already exists!";
         ExistingNameException exception = new ExistingNameException(errorMessage);
         assertEquals(errorMessage, exception.getMessage(), "Hotel name exist in database.");
+    }
+
+    @Test
+    public void Should_ReturnCities() {
+        List<String> cityNames = Arrays.asList("New York", "Los Angeles", "Chicago");
+        CityListResponseDto responseDto = new CityListResponseDto(cityNames);
+        Set<String> expectedCities = new HashSet<>(cityNames);
+        assertEquals(expectedCities, responseDto.getCities());
+    }
+
+    @Test
+    public void Should_ReturnEmptyCityList() {
+        List<String> emptyCityList = Arrays.asList();
+        CityListResponseDto responseDto = new CityListResponseDto(emptyCityList);
+        assertTrue(responseDto.getCities().isEmpty());
     }
 }

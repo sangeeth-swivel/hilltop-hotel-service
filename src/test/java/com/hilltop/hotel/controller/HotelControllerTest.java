@@ -8,6 +8,7 @@ import com.hilltop.hotel.enums.ErrorMessage;
 import com.hilltop.hotel.enums.SuccessMessage;
 import com.hilltop.hotel.exception.DataNotFoundException;
 import com.hilltop.hotel.exception.HillTopHotelApplicationException;
+import com.hilltop.hotel.exception.InvalidHotelException;
 import com.hilltop.hotel.service.HotelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -126,5 +126,12 @@ class HotelControllerTest {
             throw new DataNotFoundException(errorMessage);
         });
         assertEquals(errorMessage, exception.getMessage());
+    }
+    @Test
+    public void Should_ReturnInvalidHotelException() {
+        String errorMessage = "Invalid hotel data";
+        InvalidHotelException exception = new InvalidHotelException(errorMessage);
+
+        assertTrue(exception instanceof HillTopHotelApplicationException);
     }
 }
